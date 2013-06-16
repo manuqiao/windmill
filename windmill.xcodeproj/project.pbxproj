@@ -138,6 +138,7 @@
 		536C355C176B4C88005AD04F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 536C355B176B4C88005AD04F /* AppDelegate.m */; };
 		536C355F176B4C88005AD04F /* HelloWorldLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 536C355E176B4C88005AD04F /* HelloWorldLayer.m */; };
 		536C3562176B4C88005AD04F /* IntroLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 536C3561176B4C88005AD04F /* IntroLayer.m */; };
+		536C3569176B542E005AD04F /* windwill.png in Resources */ = {isa = PBXBuildFile; fileRef = 536C3568176B542E005AD04F /* windwill.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -413,6 +414,7 @@
 		536C355E176B4C88005AD04F /* HelloWorldLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HelloWorldLayer.m; sourceTree = "<group>"; };
 		536C3560176B4C88005AD04F /* IntroLayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntroLayer.h; sourceTree = "<group>"; };
 		536C3561176B4C88005AD04F /* IntroLayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IntroLayer.m; sourceTree = "<group>"; };
+		536C3568176B542E005AD04F /* windwill.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = windwill.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -487,6 +489,7 @@
 		536C33D4176B4C86005AD04F /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				536C3568176B542E005AD04F /* windwill.png */,
 				536C33D5176B4C86005AD04F /* Default.png */,
 				536C33D7176B4C86005AD04F /* Default@2x.png */,
 				536C33D9176B4C86005AD04F /* Default-568h@2x.png */,
@@ -923,6 +926,7 @@
 				536C33EE176B4C86005AD04F /* Icon@2x.png in Resources */,
 				536C33F1176B4C86005AD04F /* iTunesArtwork in Resources */,
 				536C353A176B4C88005AD04F /* ChangeLog in Resources */,
+				536C3569176B542E005AD04F /* windwill.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

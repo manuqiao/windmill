@@ -13,8 +13,14 @@
 #import "cocos2d.h"
 
 // HelloWorldLayer
-@interface HelloWorldLayer : CCLayer <GKAchievementViewControllerDelegate, GKLeaderboardViewControllerDelegate>
+@interface HelloWorldLayer : CCLayer
 {
+    float _startRotation;
+    CGPoint _startPosition;
+    NSDate* _movingDate;
+    
+    CGPoint _currentbegan;
+    CGPoint _currentend;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child

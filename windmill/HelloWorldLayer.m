@@ -40,66 +40,18 @@
 	// always call "super" init
 	// Apple recommends to re-assign "self" with the "super's" return value
 	if( (self=[super init]) ) {
-		
-		// create and initialize a Label
-		CCLabelTTF *label = [CCLabelTTF labelWithString:@"Hello World" fontName:@"Marker Felt" fontSize:64];
+		CGSize screenSize = [[CCDirector sharedDirector] winSize];
+        
+        
+		CCSprite *windwill = [CCSprite spriteWithFile:@"windwill.png"];
+        [windwill setPosition:CGPointMake(screenSize.width / 2, screenSize.height / 2)];
+        [windwill setScale:4];
+        [windwill setTag:1];
 
-		// ask director for the window size
-		CGSize size = [[CCDirector sharedDirector] winSize];
-	
-		// position the label on the center of the screen
-		label.position =  ccp( size.width /2 , size.height/2 );
-		
-		// add the label as a child to this Layer
-		[self addChild: label];
-		
-		
-		
-		//
-		// Leaderboards and Achievements
-		//
-		
-		// Default font size will be 28 points.
-		[CCMenuItemFont setFontSize:28];
-		
-		// Achievement Menu Item using blocks
-		CCMenuItem *itemAchievement = [CCMenuItemFont itemWithString:@"Achievements" block:^(id sender) {
-			
-			
-			GKAchievementViewController *achivementViewController = [[GKAchievementViewController alloc] init];
-			achivementViewController.achievementDelegate = self;
-			
-			AppController *app = (AppController*) [[UIApplication sharedApplication] delegate];
-			
-			[[app navController] presentModalViewController:achivementViewController animated:YES];
-			
-			[achivementViewController release];
-		}
-									   ];
+//        [windwill runAction:[CCRepeatForever actionWithAction:[CCRotateBy actionWithDuration:0.1f angle:2.0f]]];
+        [self addChild:windwill];
 
-		// Leaderboard Menu Item using blocks
-		CCMenuItem *itemLeaderboard = [CCMenuItemFont itemWithString:@"Leaderboard" block:^(id sender) {
-			
-			
-			GKLeaderboardViewController *leaderboardViewController = [[GKLeaderboardViewController alloc] init];
-			leaderboardViewController.leaderboardDelegate = self;
-			
-			AppController *app = (AppController*) [[UIApplication sharedApplication] delegate];
-			
-			[[app navController] presentModalViewController:leaderboardViewController animated:YES];
-			
-			[leaderboardViewController release];
-		}
-									   ];
-		
-		CCMenu *menu = [CCMenu menuWithItems:itemAchievement, itemLeaderboard, nil];
-		
-		[menu alignItemsHorizontallyWithPadding:20];
-		[menu setPosition:ccp( size.width/2, size.height/2 - 50)];
-		
-		// Add the menu to the layer
-		[self addChild:menu];
-
+        [self setIsTouchEnabled:YES];
 	}
 	return self;
 }
@@ -115,17 +67,60 @@
 	[super dealloc];
 }
 
-#pragma mark GameKit delegate
+#pragma mark - CCStandardTouchDelegate
 
--(void) achievementViewControllerDidFinish:(GKAchievementViewController *)viewController
+- (void)ccTouchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	AppController *app = (AppController*) [[UIApplication sharedApplication] delegate];
-	[[app navController] dismissModalViewControllerAnimated:YES];
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInView:[touch view]];
+    location = [[CCDirector sharedDirector] convertToGL:location];
+    
+    CCSprite *windwill = (CCSprite *)[self getChildByTag:1];
+    _startRotation = windwill.rotation;
+    _startPosition = location;
 }
 
--(void) leaderboardViewControllerDidFinish:(GKLeaderboardViewController *)viewController
+- (void)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-	AppController *app = (AppController*) [[UIApplication sharedApplication] delegate];
-	[[app navController] dismissModalViewControllerAnimated:YES];
+    CGPoint tapPosition;
+    UITouch *touch = [touches anyObject];
+    
+    CGPoint location = [touch locationInView:[touch view]];
+    tapPosition = [self convertToNodeSpace:[[CCDirector sharedDirector] convertToGL:location]];
+    
+    CCSprite *windwill = (CCSprite *)[self getChildByTag:1];
+    [windwill stopAllActions];
+    
+    float angle = ccpAngleSigned(ccpSub(tapPosition, windwill.position), ccpSub(_startPosition, windwill.position));
+
+    windwill.rotation = _startRotation + CC_RADIANS_TO_DEGREES((angle));
+    
+    _movingDate = [[NSDate date] retain];
+    
+    _currentbegan = [[CCDirector sharedDirector] convertToGL:[touch previousLocationInView:[touch view]]];
+    
+    _currentend = [[CCDirector sharedDirector] convertToGL:[touch locationInView:[touch view]]];
+    
+    NSLog(@"(%.2f,%.2f) to (%.2f,%.2f)", _currentbegan.x, _currentbegan.y, _currentend.x, _currentend.y);
 }
+
+- (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    UITouch *touch = [touches anyObject];
+    CGPoint location = [touch locationInView:[touch view]];
+    location = [[CCDirector sharedDirector] convertToGL:location];
+    
+    NSDate *now = [NSDate date];
+    NSTimeInterval interval = -[_movingDate timeIntervalSinceDate:now];
+//    NSLog(@"speed is %.2f", 1/interval);
+    
+    float speed = ccpSub(_currentend, _currentbegan)/
+    
+    CCSprite *windwill = (CCSprite *)[self getChildByTag:1];
+//    [windwill runAction:[CCRepeatForever actionWithAction:[CCRotateBy actionWithDuration:0.1 angle:speed]]];
+//    [windwill runAction:[CCRotateBy actionWithDuration:0.5f angle:<#(float)#>]]
+}
+
+#pragma mark -
+
 @end
