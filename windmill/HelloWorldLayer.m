@@ -47,7 +47,8 @@
         [windwill setPosition:CGPointMake(screenSize.width / 2, screenSize.height / 2)];
         [windwill setScale:4];
         [windwill setTag:1];
-
+        
+        _currentbegan = windwill.rotation;
 //        [windwill runAction:[CCRepeatForever actionWithAction:[CCRotateBy actionWithDuration:0.1f angle:2.0f]]];
         [self addChild:windwill];
 
@@ -82,26 +83,37 @@
 
 - (void)ccTouchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    CGPoint tapPosition;
     UITouch *touch = [touches anyObject];
     
-    CGPoint location = [touch locationInView:[touch view]];
-    tapPosition = [self convertToNodeSpace:[[CCDirector sharedDirector] convertToGL:location]];
+    CGPoint location = [[CCDirector sharedDirector] convertToGL:[touch locationInView:[touch view]]];
     
     CCSprite *windwill = (CCSprite *)[self getChildByTag:1];
     [windwill stopAllActions];
     
-    float angle = ccpAngleSigned(ccpSub(tapPosition, windwill.position), ccpSub(_startPosition, windwill.position));
+    float angle = ccpAngleSigned(ccpSub(location, windwill.position), ccpSub(_startPosition, windwill.position));
 
     windwill.rotation = _startRotation + CC_RADIANS_TO_DEGREES((angle));
     
-    _movingDate = [[NSDate date] retain];
+    if (!_movingDate) {
+        _movingDate = [[NSDate date] retain];
+    }
+    else {
+        NSDate *now = [NSDate date];
+        _movingInterval = -[_movingDate timeIntervalSinceDate:now];
+        _movingDate = [now retain];
+    }
     
-    _currentbegan = [[CCDirector sharedDirector] convertToGL:[touch previousLocationInView:[touch view]]];
+//    NSLog(@"moving interval : %.2f", _movingInterval);
     
-    _currentend = [[CCDirector sharedDirector] convertToGL:[touch locationInView:[touch view]]];
+    _currentend = windwill.rotation;
     
-    NSLog(@"(%.2f,%.2f) to (%.2f,%.2f)", _currentbegan.x, _currentbegan.y, _currentend.x, _currentend.y);
+//    NSLog(@"(%.2f,%.2f) to (%.2f,%.2f)", _currentbegan.x, _currentbegan.y, _currentend.x, _currentend.y);
+//    NSLog(@"current location : (%.2f,%.2f)", location.x, location.y);
+    
+    _speed = (_currentend - _currentbegan) / _movingInterval;
+    NSLog(@"speed : %.2f", _speed);
+    
+    _currentbegan = _currentend;
 }
 
 - (void)ccTouchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -110,17 +122,26 @@
     CGPoint location = [touch locationInView:[touch view]];
     location = [[CCDirector sharedDirector] convertToGL:location];
     
-    NSDate *now = [NSDate date];
-    NSTimeInterval interval = -[_movingDate timeIntervalSinceDate:now];
-//    NSLog(@"speed is %.2f", 1/interval);
-    
-    float speed = ccpSub(_currentend, _currentbegan)/
-    
+    float friction = 2500;
+    float time = [self getTimeFromAcceleration:friction Velocity:_speed];
+    float distance = [self getDistanceFromAcceleration:friction Velocity:_speed Time:time];
+//    NSLog(@"time : %f", time);
+//    NSLog(@"distance : %f", distance);
     CCSprite *windwill = (CCSprite *)[self getChildByTag:1];
-//    [windwill runAction:[CCRepeatForever actionWithAction:[CCRotateBy actionWithDuration:0.1 angle:speed]]];
-//    [windwill runAction:[CCRotateBy actionWithDuration:0.5f angle:<#(float)#>]]
+    [windwill runAction:[CCEaseOut actionWithAction:[CCRotateBy actionWithDuration:time*10 angle:distance] rate:3]];
 }
 
-#pragma mark -
-
+#pragma mark -Utils
+- (float)getTimeFromAcceleration:(float)a Velocity:(float)v
+{
+    float time;
+    time = v/a;
+    return time;
+}
+- (float)getDistanceFromAcceleration:(float)a Velocity:(float)v Time:(float)t
+{
+    float distance;
+    distance = v * t + 0.5 * a * t * t;
+    return distance;
+}
 @end

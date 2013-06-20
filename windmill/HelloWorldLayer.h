@@ -17,10 +17,13 @@
 {
     float _startRotation;
     CGPoint _startPosition;
-    NSDate* _movingDate;
     
-    CGPoint _currentbegan;
-    CGPoint _currentend;
+    NSDate* _movingDate;
+    float _movingInterval;
+    float _speed;
+    
+    float _currentbegan;
+    float _currentend;
 }
 
 // returns a CCScene that contains the HelloWorldLayer as the only child
